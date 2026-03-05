@@ -51,8 +51,24 @@ services:
       - prometheus_data:/prometheus
     networks:
       - app-network
-#  loki:
-#  promtail:
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    ports:
+      - 3100:3100
+    volumes:
+      - ./config/loki-config.yml:/etc/loki/loki-config.yaml
+      - loki-data:/loki
+    networks:
+      - app-network
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:latest
+    volumes:
+      - ./config/promtail-config.yml:/etc/promtail/promtail-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - app-network
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
@@ -66,7 +82,18 @@ services:
     privileged: true
     networks:
       - app-network
-#  grafana:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config/grafana-provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - .env
+    networks:
+      - app-network
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -112,4 +139,8 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  loki_data:
+    driver: local
+  grafana_data:
     driver: local
