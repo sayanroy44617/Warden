@@ -8,18 +8,29 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:8080
+      - 8000:8000
     networks:
         - app-network
     volumes:
        - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       redis:
-        - condition: service_healthy
-      postgres :
-        - condition: service_healthy
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
-#  demo-api:
+  demo-app:
+    container_name: demo-app
+    build:
+      context: ./demo-app
+      dockerfile: Dockerfile
+    image: demo-app:latest
+    environment:
+      MODE: normal
+    networks:
+      - app-network
+    restart: always
+
 #  demo-worker:
   demo-db:
     image: postgres:15.1-alpine
@@ -41,6 +52,7 @@ services:
       - postgres_data_demo:/var/lib/postgresql/data
     networks:
       - app-network
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -58,7 +70,7 @@ services:
       - 3100:3100
     volumes:
       - ./config/loki-config.yml:/etc/loki/loki-config.yaml
-      - loki-data:/loki
+      - loki_data:/loki
     networks:
       - app-network
   promtail:
@@ -94,6 +106,7 @@ services:
       - .env
     networks:
       - app-network
+
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -108,6 +121,7 @@ services:
       - redis_data:/data
     networks:
       - app-network
+
   postgres:
     image: postgres:15.1-alpine
     container_name: postgres
@@ -143,4 +157,6 @@ volumes:
   loki_data:
     driver: local
   grafana_data:
+    driver: local
+  prometheus_data:
     driver: local
