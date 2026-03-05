@@ -41,7 +41,16 @@ services:
       - postgres_data_demo:/var/lib/postgresql/data
     networks:
       - app-network
-#  promethus:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - app-network
 #  loki:
 #  promtail:
   cadvisor:
