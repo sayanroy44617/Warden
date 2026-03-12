@@ -1,6 +1,10 @@
 import asyncio
 import logging
+import uuid
+from datetime import datetime
+
 import httpx
+from .models.incident import Incident, SeverityEnum, IncidentStatusEnum
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,16 +59,67 @@ class Monitor:
         promql = 'rate(container_cpu_usage_seconds_total{image!=""}[1m]) * 100'
         data = await self.get_prometheus_data(promql)
         if data is None:
-            return
+            return None
+
+        for result in data['data']['result']:
+            container_name = result['metric']['container_name']
+            cpu_value = float(result['value'][1])
+            logger.info(f"CPU usage for container {container_name}: {cpu_value}%")
+            if cpu_value > 80:
+                incident = Incident(
+                    id = uuid.uuid4().hex,
+                    timestamp = datetime.now(),
+                    container_name=container_name,
+                    logs=[],
+                    crash_reason="HIGH CPU USAGE",
+                    severity = SeverityEnum.HIGH,
+                    incident_status = IncidentStatusEnum.DETECTED
+                )
+                logger.warning(f"Incident created for {container_name}: HIGH CPU")
+                return incident
+        return None
 
     async def check_memory(self):
         promql = 'container_memory_usage_bytes{image!=""} / container_spec_memory_limit_bytes{image!=""} * 100'
         data = await self.get_prometheus_data(promql)
         if data is None:
-            return
+            return None
+        for result in data['data']['result']:
+            container_name = result['metric']['container_name']
+            memory_value = float(result['value'][1])
+            logger.info(f"Memory usage for container {container_name}: {memory_value}%")
+            if memory_value > 85:
+                incident = Incident(
+                    id = uuid.uuid4().hex,
+                    timestamp = datetime.now(),
+                    container_name=container_name,
+                    logs=[],
+                    crash_reason="HIGH MEMORY USAGE",
+                    severity = SeverityEnum.HIGH,
+                    incident_status = IncidentStatusEnum.DETECTED
+                )
+                logger.warning(f"Incident created for {container_name}: HIGH MEMORY")
+                return incident
+        return None
 
     async def check_restart_count(self):
         promql = 'container_restart_count{image!=""}'
         data = await self.get_prometheus_data(promql)
         if data is None:
-            return
+            return None
+        for result in data['data']['result']:
+            container_name = result['metric']['container_name']
+            restart_count = int(result['value'][1])
+            logger.info(f"Restart for container {container_name}: {restart_count}%")
+            if restart_count > 3:
+                incident = Incident(
+                    id = uuid.uuid4().hex,
+                    timestamp = datetime.now(),
+                    container_name=container_name,
+                    logs=[],
+                    crash_reason="HIGH RESTART COUNT",
+                    severity = SeverityEnum.CRITICAL,
+                    incident_status = IncidentStatusEnum.DETECTED
+                )
+                logger.warning(f"Incident created for {container_name}: Restart Count")
+                return incident
