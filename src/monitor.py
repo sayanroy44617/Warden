@@ -60,9 +60,8 @@ class Monitor:
         data = await self.get_prometheus_data(promql)
         if data is None:
             return None
-
         for result in data['data']['result']:
-            container_name = result['metric']['container_name']
+            container_name = result['metric']['name']
             cpu_value = float(result['value'][1])
             logger.info(f"CPU usage for container {container_name}: {cpu_value}%")
             if cpu_value > 80:
@@ -85,7 +84,7 @@ class Monitor:
         if data is None:
             return None
         for result in data['data']['result']:
-            container_name = result['metric']['container_name']
+            container_name = result['metric']['name']
             memory_value = float(result['value'][1])
             logger.info(f"Memory usage for container {container_name}: {memory_value}%")
             if memory_value > 85:
@@ -108,7 +107,7 @@ class Monitor:
         if data is None:
             return None
         for result in data['data']['result']:
-            container_name = result['metric']['container_name']
+            container_name = result['metric']['name']
             restart_count = int(result['value'][1])
             logger.info(f"Restart for container {container_name}: {restart_count}%")
             if restart_count > 3:
