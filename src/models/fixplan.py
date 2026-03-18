@@ -6,4 +6,5 @@ class FixPlan(BaseModel):
     incident_id: str
     action: str
     explanation: str
+    root_cause: str = ""
     parameters: dict = {}
