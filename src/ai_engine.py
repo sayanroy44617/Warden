@@ -2,7 +2,8 @@ import json
 import uuid
 
 from dotenv import load_dotenv
-import os , time
+import os
+import time
 import httpx
 import logging
 
@@ -16,16 +17,18 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class AIEngine:
 
-    def __init__(self , loki_url ):
+class AIEngine:
+    def __init__(self, loki_url):
         self.loki_url = loki_url
         self.api_key = API_KEY
         self.client = httpx.AsyncClient()
         genai.configure(api_key=API_KEY)
         self.model = genai.GenerativeModel("gemini-2.0-flash")
 
-    async def analyze_incident(self , incident : Incident , logs : list[str]) -> FixPlan|None :
+    async def analyze_incident(
+        self, incident: Incident, logs: list[str]
+    ) -> FixPlan | None:
         prompt = (
             f"You are a DevOps expert analyzing a container incident.\n\n"
             f"Container: {incident.container_name}\n"
@@ -52,14 +55,13 @@ class AIEngine:
             explanation = parsed["explanation"]
             parameters = parsed["parameters"]
 
-
             return FixPlan(
                 id=uuid.uuid4().hex,
                 incident_id=incident.id,
                 action=action,
                 explanation=explanation,
                 parameters=parameters,
-                root_cause=root_cause
+                root_cause=root_cause,
             )
         except json.JSONDecodeError as e:
             logger.error(f"Gemini returned invalid JSON: {e}")
@@ -71,13 +73,13 @@ class AIEngine:
             logger.error(f"Unexpected error analyzing incident: {e}")
             return None
 
-    async def get_logs_from_loki(self , container_name : str) -> list[str]:
+    async def get_logs_from_loki(self, container_name: str) -> list[str]:
         query = f'{{name="{container_name}"}}'
         params = {
             "query": query,
-            "limit" : 50 ,
-            "start" : int((time.time() - 600) * 1e9),
-            "end" : int(time.time() * 1e9)
+            "limit": 50,
+            "start": int((time.time() - 600) * 1e9),
+            "end": int(time.time() * 1e9),
         }
         loki_log_url = f"{self.loki_url}/loki/api/v1/query_range"
 
@@ -100,5 +102,3 @@ class AIEngine:
         except Exception as e:
             logger.error(f"Error fetching Loki logs: {e}")
             return []
-
-

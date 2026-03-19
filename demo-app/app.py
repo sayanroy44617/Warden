@@ -6,15 +6,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 mode = os.getenv("MODE")
 
+
 def normal_operation():
     while True:
         logger.info("Demo Api is up and running")
         time.sleep(2)
 
+
 def cpu_spike():
     logger.warning("WARN: CPU spike triggered")
     while True:
-        x = 99999 ** 99999  # useless heavy calculation
+        var = 99999**99999  # noqa: F841
+
 
 def memory_leak():
     leak = []
@@ -23,8 +26,10 @@ def memory_leak():
         logger.warning(f"WARN: Memory growing, size: {len(leak)} items")
         time.sleep(0.1)
 
+
 def crash():
     raise Exception("Demo Api crashed")
+
 
 if __name__ == "__main__":
     if mode == "cpu_spike":

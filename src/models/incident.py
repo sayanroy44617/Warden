@@ -13,11 +13,13 @@ class IncidentStatusEnum(Enum):
     EXECUTING = "executing"
     FAILED = "failed"
 
+
 class SeverityEnum(Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 class Incident(BaseModel):
     id: str
@@ -25,5 +27,5 @@ class Incident(BaseModel):
     container_name: str
     logs: list[str]
     crash_reason: Optional[str]
-    severity : SeverityEnum
-    incident_status : IncidentStatusEnum = IncidentStatusEnum.DETECTED
+    severity: SeverityEnum
+    incident_status: IncidentStatusEnum = IncidentStatusEnum.DETECTED
