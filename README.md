@@ -210,12 +210,18 @@ Work in progress — being built in pair programming sessions.
 - [x] Prometheus + Loki + Grafana setup
 - [x] Pydantic models (Incident, FixPlan, FixResult)
 - [x] Monitor engine (Prometheus polling)
-- [ ] AI engine (Claude integration)
-- [ ] Email notifier
-- [ ] Approval server (FastAPI)
+- [x] AI engine (Gemini integration)
+- [x] Email notifier
+- [x] Approval server (FastAPI)
 - [ ] Fix executor (Docker SDK)
 - [ ] End-to-end testing
 
+---
+
+## 🔮 Future Plans
+- [ ] Agentic AI — autonomous multi-step remediation
+- [ ] Multiple container monitoring
+- [ ] Kubernetes support
 ---
 
 ## 📄 License

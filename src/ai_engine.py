@@ -38,9 +38,13 @@ class AIEngine:
             f"Respond in this exact JSON format:\n"
             f"{{\n"
             f'  "root_cause": "...",\n'
-            f'  "action": "restart" or "update_resources",\n'
+            f'  "action":  "restart" or "update_resources" or "exec_command",\n'
             f'  "explanation": "plain english explanation",\n'
-            f'  "parameters": {{}}\n'
+            f'  "parameters": {{\n'
+            f'  "memory": "512m",  (only if action is update_resources)\n'
+            f'  "cpu": 50000,      (only if action is update_resources)\n'
+            f'   "command": "..."   (only if action is exec_command)\n'
+            f'  }}\n'
             f"}}"
         )
 
@@ -58,6 +62,7 @@ class AIEngine:
             return FixPlan(
                 id=uuid.uuid4().hex,
                 incident_id=incident.id,
+                container_name=incident.container_name,
                 action=action,
                 explanation=explanation,
                 parameters=parameters,
