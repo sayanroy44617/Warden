@@ -44,7 +44,7 @@ class AIEngine:
             f'  "memory": "512m",  (only if action is update_resources)\n'
             f'  "cpu": 50000,      (only if action is update_resources)\n'
             f'   "command": "..."   (only if action is exec_command)\n'
-            f'  }}\n'
+            f"  }}\n"
             f"}}"
         )
 
