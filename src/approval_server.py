@@ -17,7 +17,9 @@ logger.setLevel(logging.INFO)
 
 
 @warden_router.get("/approve/{incident_id}")
-async def approve_incident(incident_id: str, executor :FixExecutor = Depends(lambda: fix_executor)):
+async def approve_incident(
+    incident_id: str, executor: FixExecutor = Depends(lambda: fix_executor)
+):
     fix_plan = await redis.get(f"fixplan:{incident_id}")
 
     if fix_plan is None:
@@ -25,10 +27,9 @@ async def approve_incident(incident_id: str, executor :FixExecutor = Depends(lam
 
     parsed = FixPlan(**json.loads(fix_plan))
     logger.info(f"Fixplan approved: {parsed}")
-    execution_response =  await executor.execute_fix(parsed)
+    execution_response = await executor.execute_fix(parsed)
     await redis.delete(f"fixplan:{incident_id}")
     return {"message": "Fixplan approved", "execution_response": execution_response}
-
 
 
 @warden_router.get("/reject/{incident_id}")
