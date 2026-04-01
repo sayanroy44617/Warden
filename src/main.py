@@ -4,9 +4,9 @@ import logging
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from src.dependencies import monitor, ai_engine, notifier
-from src.approval_server import warden_router
-from src.redis_client import get_redis_client
+from dependencies import monitor, ai_engine, notifier
+from approval_server import warden_router
+from redis_client import get_redis_client
 
 logger = logging.getLogger("uvicorn")
 redis = get_redis_client()
